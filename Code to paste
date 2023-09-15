@@ -1,0 +1,75 @@
+import math
+import time
+import random
+
+def angle(a, b, c):
+	ang = math.degrees(math.atan2(c[1]-b[1], c[0]-b[0]) - math.atan2(a[1]-b[1], a[0]-b[0]))
+	return ang + 360 if ang < 0 else ang
+	
+def distance(p1, p2):
+	'''helper function for finding distance'''
+	dx=p1[0]-p2[0]
+	dy=p1[1]-p2[1]
+	return math.sqrt(dx*dx+dy*dy*2)
+	
+def add(a, b):
+	return [a[0]+b[0], a[1]+b[1]]
+
+def mul(a, b):
+	return [a[0]*b[0], a[1]*b[1]]
+
+def lk(t, a, b, d=1):
+	a, b=[min([a, b]), max([a, b])]
+	return int(a<=t<=b)+int(a<=t<=a+d or b-d<=t<=b)
+	
+def xor(a, b):
+	if a and b:
+		return 2
+	else:
+		return a or b
+
+def f(x, y):
+	radii=[40+10*math.sin(math.radians(r3)), 45+10*math.sin(math.radians(r3*1.5))]
+	
+	dire=angle([x, y], [30, 15], [30, 16])
+	dist=distance([x, y], add([30, 15], mul([math.sin(math.radians(r2)), math.cos(math.radians(r2))], [15, 11])))
+	radius=int(lk(distance([x, y], [30, 15]), 40+10*math.sin(math.radians(r3)), 45+10*math.sin(math.radians(r3*1.5))))
+	voide=int(lk(distance([x, y], [30, 15]), max(radii)+10, 100))
+	lenght=14+15*math.sin(math.radians(r3*1.812))
+	
+	ray=lk(dire, r-10, r+10, d=5)*4
+	ball=[0, 0, 2][lk(dist, 0, 5, d=2)]
+	ring=radius*4
+	if ring>1: ring+=random.choice([0]*5+[-1])
+	smol_ring=(int(lk(distance([x, y], [30, 15]), -5, 16))-1)*2
+	if smol_ring<0: smol_ring=0
+	void=voide
+	
+	value=(ray+ball+ring+smol_ring)%5
+	if ray and ring:
+		value=0
+	if ray and ball:
+		value=1
+	if void:
+		value=random.randint(0, 21)
+	if void and ray:
+		value=random.choice([0]*5+[9])
+	
+	return value
+
+r=0
+r2=0
+r3=10
+while True:
+	buffer=''
+	for y in range(30):
+		for x in range(100):
+			i=f(x, y)
+			buffer+=[' ', '-', '+', '=', '#', '%', '$', '^', '&', '!', '(', ')', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'][i]
+		buffer+='\n'
+	r+=5
+	r2-=2.25
+	r3+=1
+	r, r2=r%360, r2%360
+	print(buffer+'\n')
+	time.sleep(1/256)
